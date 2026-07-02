@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helpdesk EOD Dashboard</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f6f7f9; color: #1a1d21; font-size: 14px; }
+  .hero { background: linear-gradient(135deg, #1e3a8a, #6d28d9); color: #fff; padding: 28px 24px 22px; }
+  .hero h1 { font-size: 22px; margin-bottom: 4px; }
+  .hero .sub { opacity: .85; font-size: 13px; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 24px 40px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+  .pill { border: 1px solid #d1d5db; background: #fff; border-radius: 999px; padding: 6px 15px; cursor: pointer; font-size: 13px; color: #374151; }
+  .pill.active { background: #1f2937; color: #fff; border-color: #1f2937; }
+  .stats { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat .num { font-size: 24px; font-weight: 700; }
+  .stat .lbl { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; }
+  .stat.ok .num { color: #059669; } .stat.warn .num { color: #d97706; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; padding: 10px 14px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+  td { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge.gy { background: #ede9fe; color: #6d28d9; }
+  .badge.morning { background: #dbeafe; color: #1d4ed8; }
+  .badge.none { background: #f3f4f6; color: #6b7280; }
+  .badge.missing { background: #fef3c7; color: #b45309; }
+  .badge.done { background: #d1fae5; color: #047857; }
+  .badge.off { background: #e5e7eb; color: #4b5563; }
+  a.sheet { color: #2563eb; text-decoration: none; font-weight: 500; }
+  a.sheet:hover { text-decoration: underline; }
+  .missing-row td { color: #9ca3af; }
+  .foot { color: #9ca3af; font-size: 12px; margin-top: 14px; }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <h1>📋 Helpdesk EOD Dashboard</h1>
+    <div class="sub">Daily agent EOD reports from #helpdeskeod · Last updated: <span id="upd"></span></div>
+  </div>
+  <div class="wrap"><div id="app"></div>
+    <div class="foot">Refreshed each weekday morning. Metrics = TOTAL TICKETS HANDLED / TOTAL WORKED TIME / AVG TICKETS PER HOUR.</div>
+  </div>
+
+<script>
+const LAST_UPDATED = "July 2, 2026";
+const ROSTER = ['Malyn','Adrian','Heba','Elton','Cris','Nash','Junel','Chloe','John Carlo','Elle','Manar','Rean','Shahenna'];
+// r: [shift, postedAt, sheetUrl] — m: [tickets, workedTime, avgPerHr]
+const DATA = {
+ "July 1, 2026": {
+  r: {
+   "Manar":["GY","Jul 2 07:24","https://docs.google.com/spreadsheets/d/1IhTjHj4I0AOppK3ck76ckZxkOO2GdoXlOzhtE5qjLDA/edit?gid=1548882031"],
+   "Cris":["GY","Jul 2 07:14","https://docs.google.com/spreadsheets/d/1XDZSHT8rBUojvmdXJ7zijFRVR40hwSsPZtMK6al1zQc/edit?gid=701110439"],
+   "Heba":["GY","Jul 2 04:21","https://docs.google.com/spreadsheets/d/1YmvhqiueW9c4gfljfeqBAGd7I5rNjRUTM_HXRU1yHTI/edit?gid=406758236"],
+   "Elton":["","Jul 1 20:43","https://docs.google.com/spreadsheets/d/1O5U0sWFhNJ5dU6OJ14-Zm3ukaiXckiEORWmUz0rKoz0/edit?gid=603193214"],
+   "Malyn":["Morning","Jul 1 19:48","https://docs.google.com/spreadsheets/d/13em3BT99IKw2hC6OIStg3e7AnfUOpg70mnh_ZZQBoMw/edit?gid=454137923"],
+   "Rean":["Morning","Jul 1 18:55","https://docs.google.com/spreadsheets/d/1JXLix1u5tThlSw8WgcgNuJqJ1iUT2uqRRPe3rnp64K4/edit?gid=1947327796"],
+   "John Carlo":["","Jul 1 18:22","https://docs.google.com/spreadsheets/d/1_Yo4wzfNj1yGO-HG1HCoWSjxA8Ot3E6YBq2XFG3SoBs/edit?gid=238204848"],
+   "Nash":["","Jul 1 17:38","https://docs.google.com/spreadsheets/d/1p2VAbj-WRyUJah-l04UjyOtcmVdbqNikR3m9lvZ6ga4/edit?gid=418388210"]
+  },
+  m: {
+   "Malyn":["104","8:00","13.0"],"Heba":["107","8:00","13.38"],"Elton":["75","6:00","12.5"],
+   "Cris":["114","9:30","12"],"Nash":["105","8:00","13.13"],"John Carlo":["83","6:23","13"],
+   "Elle":["10","N/A","N/A"],"Manar":["107","8:00","13.3"],"Rean":["104","8:00","13"]
+  },
+  off: ["Elle"]
+ },
+ "June 30, 2026": {
+  r: {
+   "Cris":["GY","Jul 1 07:16","https://docs.google.com/spreadsheets/d/1XDZSHT8rBUojvmdXJ7zijFRVR40hwSsPZtMK6al1zQc/edit?gid=1310696693"],
+   "Adrian":["GY","Jul 1 07:13","https://app.ticketdesk.ai/tickets?inbox_id=16&user_id=44"],
+   "Manar":["GY","Jul 1 06:45","https://docs.google.com/spreadsheets/d/1IhTjHj4I0AOppK3ck76ckZxkOO2GdoXlOzhtE5qjLDA/edit?gid=930010"],
+   "Elle":["","Jun 30 22:29","https://docs.google.com/spreadsheets/d/1DlSr3ITVro1ZKxRsaqnrmtcvSMn6PE79plBEgBcnXGA/edit?gid=826289637"],
+   "Junel":["","Jun 30 20:46","https://docs.google.com/spreadsheets/d/1x26AtFUWmYh05y6kVLJPwRblNv43HtCbxQWgiie7GGY/edit?gid=763808496"],
+   "Elton":["","Jun 30 19:55","https://docs.google.com/spreadsheets/d/1O5U0sWFhNJ5dU6OJ14-Zm3ukaiXckiEORWmUz0rKoz0/edit?gid=2079253953"],
+   "Malyn":["Morning","Jun 30 17:58","https://docs.google.com/spreadsheets/d/13em3BT99IKw2hC6OIStg3e7AnfUOpg70mnh_ZZQBoMw/edit?gid=491978572"],
+   "Chloe":["Morning","Jun 30 17:55","https://docs.google.com/spreadsheets/d/16vdiQNW7fBKa7FNAm1N-eRTiVfGejz4-d-vXP_AnSls/edit?gid=544778252"],
+   "John Carlo":["Morning","Jun 30 16:34","https://docs.google.com/spreadsheets/d/1_Yo4wzfNj1yGO-HG1HCoWSjxA8Ot3E6YBq2XFG3SoBs/edit?gid=1928507650"],
+   "Heba":["Morning","Jun 30 15:08","https://docs.google.com/spreadsheets/d/1YmvhqiueW9c4gfljfeqBAGd7I5rNjRUTM_HXRU1yHTI/edit?gid=495629195"]
+  },
+  m: {
+   "Malyn":["88","7:20","12.0"],"Heba":["107","8:00","13.38"],"Elton":["48","4:00","12"],
+   "Cris":["81","6:30","12.46"],"Junel":["54","8:07","6.65"],"Chloe":["60","5:00","12"],
+   "John Carlo":["101","8:20","12.12"],"Elle":["98","8:00","12.25"],"Manar":["96","8:00","12.0"]
+  },
+  off: []
+ },
+ "June 29, 2026": {
+  r: {
+   "Cris":["GY","Jun 30 07:12","https://docs.google.com/spreadsheets/d/1XDZSHT8rBUojvmdXJ7zijFRVR40hwSsPZtMK6al1zQc/edit?gid=1906619893"],
+   "Manar":["GY","Jun 30 05:37","https://docs.google.com/spreadsheets/d/1IhTjHj4I0AOppK3ck76ckZxkOO2GdoXlOzhtE5qjLDA/edit?gid=316409615"],
+   "Adrian":["GY","Jun 30 05:33","https://docs.google.com/spreadsheets/d/1XL4iZKPF98oZPtV94zg9AGAA6kRrLLziywGmzS36MlU/edit?gid=311651687"],
+   "Junel":["","Jun 29 20:26","https://docs.google.com/spreadsheets/d/1x26AtFUWmYh05y6kVLJPwRblNv43HtCbxQWgiie7GGY/edit?gid=2062376582"],
+   "Elle":["","Jun 29 18:21","https://docs.google.com/spreadsheets/d/1DlSr3ITVro1ZKxRsaqnrmtcvSMn6PE79plBEgBcnXGA/edit?gid=1489376772"],
+   "Chloe":["Morning","Jun 29 17:45","https://docs.google.com/spreadsheets/d/16vdiQNW7fBKa7FNAm1N-eRTiVfGejz4-d-vXP_AnSls/edit?gid=1942322538"],
+   "Heba":["","Jun 29 17:36","https://docs.google.com/spreadsheets/d/1YmvhqiueW9c4gfljfeqBAGd7I5rNjRUTM_HXRU1yHTI/edit?gid=1004457355"],
+   "John Carlo":["","Jun 29 17:03","https://docs.google.com/spreadsheets/d/1_Yo4wzfNj1yGO-HG1HCoWSjxA8Ot3E6YBq2XFG3SoBs/edit?gid=1460120543"],
+   "Elton":["","Jun 29 15:41","https://docs.google.com/spreadsheets/d/1O5U0sWFhNJ5dU6OJ14-Zm3ukaiXckiEORWmUz0rKoz0/edit?gid=774652396"]
+  },
+  m: {
+   "Adrian":["84","7:00","12.0"],"Heba":["103","8:00","12.88"],"Elton":["50","4:00","12.5"],
+   "Junel":["99","8:07","12.2"],"Chloe":["62","5:00","12.4"],"John Carlo":["76","6:19","12.03"],
+   "Elle":["60","6:00","10.0"],"Manar":["50","4:00","12.5"],"Rean":["43","3:00","14.33"]
+  },
+  off: []
+ }
+};
+
+document.getElementById('upd').textContent = LAST_UPDATED;
+const dash = v => (!v || v === '—') ? '—' : v;
+
+function render(sel) {
+  const dates = Object.keys(DATA);
+  if (!dates.includes(sel)) sel = dates[0];
+  const d = DATA[sel];
+  const met = d.m, reps = d.r, off = d.off || [];
+  const submitted = ROSTER.filter(a => reps[a]);
+  const missing = ROSTER.filter(a => !reps[a] && !off.includes(a));
+  const total = Object.values(met).reduce((s, v) => s + (parseInt(v[0], 10) || 0), 0);
+
+  let h = '<div class="pills">' + dates.map(x =>
+    `<button class="pill${x === sel ? ' active' : ''}" onclick="render('${x}')">${x}</button>`).join('') + '</div>';
+  h += `<div class="stats">
+    <div class="stat ok"><div class="num">${submitted.length}/${ROSTER.length}</div><div class="lbl">Submitted</div></div>
+    <div class="stat warn"><div class="num">${missing.length}</div><div class="lbl">Missing</div></div>
+    <div class="stat"><div class="num">${total}</div><div class="lbl">Total tickets</div></div>
+  </div>`;
+  h += '<table><tr><th>Agent</th><th>Status</th><th>Shift</th><th>Tickets</th><th>Worked Time</th><th>Avg/hr</th><th>Posted</th><th>Report</th></tr>';
+  for (const a of ROSTER) {
+    const r = reps[a], v = met[a] || [];
+    if (r) {
+      h += `<tr><td><strong>${a}</strong></td><td><span class="badge done">Submitted</span></td>
+        <td>${r[0] ? `<span class="badge ${r[0] === 'GY' ? 'gy' : 'morning'}">${r[0]}</span>` : '—'}</td>
+        <td>${dash(v[0])}</td><td>${dash(v[1])}</td><td>${dash(v[2])}</td><td>${r[1]}</td>
+        <td><a class="sheet" href="${r[2]}" target="_blank" rel="noopener">Open ↗</a></td></tr>`;
+    } else if (off.includes(a)) {
+      h += `<tr class="missing-row"><td>${a}</td><td><span class="badge off">OFF</span></td><td>—</td><td>${dash(v[0])}</td><td>${dash(v[1])}</td><td>${dash(v[2])}</td><td>—</td><td>—</td></tr>`;
+    } else {
+      h += `<tr class="missing-row"><td>${a}</td><td><span class="badge missing">No report</span></td><td>—</td><td>${dash(v[0])}</td><td>${dash(v[1])}</td><td>${dash(v[2])}</td><td>—</td><td>—</td></tr>`;
+    }
+  }
+  h += '</table>';
+  document.getElementById('app').innerHTML = h;
+}
+render(Object.keys(DATA)[0]);
+</script>
+</body>
+</html>
