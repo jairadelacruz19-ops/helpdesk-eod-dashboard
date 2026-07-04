@@ -46,12 +46,30 @@ a.sheet:hover { text-decoration: underline; }
 <div class="foot">Refreshed each weekday morning. Metrics = TOTAL TICKETS HANDLED / TOTAL WORKED TIME / AVG TICKETS PER HOUR.</div>
 </div>
 <script>
-const LAST_UPDATED = "July 3, 2026";
+const LAST_UPDATED = "July 4, 2026";
 const ROSTER = ['Malyn','Adrian','Heba','Elton','Cris','Nash','Junel','Chloe','John Carlo','Elle','Manar','Rean','Shahenna'];
 // r: [shift, postedAt, sheetUrl] — m: [tickets, workedTime, avgPerHr]
 const DATA = {
+"July 3, 2026": {
+r: {
+"Junel":["GY","Jul 4 07:15","https://docs.google.com/spreadsheets/d/1x26AtFUWmYh05y6kVLJPwRblNv43HtCbxQWgiie7GGY/edit?gid=858657540"],
+"Cris":["GY","Jul 4 06:12","https://docs.google.com/spreadsheets/d/1XDZSHT8rBUojvmdXJ7zijFRVR40hwSsPZtMK6al1zQc/edit?gid=2100078856"],
+"Heba":["GY","Jul 4 03:13","https://docs.google.com/spreadsheets/d/1YmvhqiueW9c4gfljfeqBAGd7I5rNjRUTM_HXRU1yHTI/edit?gid=1659193040"],
+"Elle":["Morning","Jul 3 21:57","https://docs.google.com/spreadsheets/d/1DlSr3ITVro1ZKxRsaqnrmtcvSMn6PE79plBEgBcnXGA/edit?gid=131331384"],
+"Elton":["Morning","Jul 3 20:32","https://docs.google.com/spreadsheets/d/1O5U0sWFhNJ5dU6OJ14-Zm3ukaiXckiEORWmUz0rKoz0/edit?gid=282512091"],
+"Chloe":["Morning","Jul 3 19:50","https://docs.google.com/spreadsheets/d/16vdiQNW7fBKa7FNAm1N-eRTiVfGejz4-d-vXP_AnSls/edit?gid=213136589"],
+"Malyn":["Morning","Jul 3 19:10","https://docs.google.com/spreadsheets/d/13em3BT99IKw2hC6OIStg3e7AnfUOpg70mnh_ZZQBoMw/edit?gid=1469862936"],
+"Rean":["Morning","Jul 3 18:56","https://docs.google.com/spreadsheets/d/1JXLix1u5tThlSw8WgcgNuJqJ1iUT2uqRRPe3rnp64K4/edit?gid=409750165"],
+"Adrian":["Morning","Jul 3 17:27","https://docs.google.com/spreadsheets/d/1XL4iZKPF98oZPtV94zg9AGAA6kRrLLziywGmzS36MlU/edit?gid=1974528880"],
+"Nash":["Morning","Jul 3 16:23","https://docs.google.com/spreadsheets/d/1p2VAbj-WRyUJah-l04UjyOtcmVdbqNikR3m9lvZ6ga4/edit?gid=936280866"]
+},
+m: {},
+off: []
+},
 "July 2, 2026": {
 r: {
+"Cris":["GY","Jul 3 07:38","https://docs.google.com/spreadsheets/d/1XDZSHT8rBUojvmdXJ7zijFRVR40hwSsPZtMK6al1zQc/edit?gid=461343429"],
+"Heba":["GY","Jul 3 05:46","https://docs.google.com/spreadsheets/d/1YmvhqiueW9c4gfljfeqBAGd7I5rNjRUTM_HXRU1yHTI/edit?gid=1089694061"],
 "Manar":["GY","Jul 3 05:18","https://docs.google.com/spreadsheets/d/1IhTjHj4I0AOppK3ck76ckZxkOO2GdoXlOzhtE5qjLDA/edit?gid=1293897886"],
 "Adrian":["Morning","Jul 2 20:32","https://docs.google.com/spreadsheets/d/1XL4iZKPF98oZPtV94zg9AGAA6kRrLLziywGmzS36MlU/edit?gid=2022857135"],
 "Elle":["Morning","Jul 2 20:13","https://docs.google.com/spreadsheets/d/1DlSr3ITVro1ZKxRsaqnrmtcvSMn6PE79plBEgBcnXGA/edit?gid=2100729880"],
@@ -61,9 +79,9 @@ r: {
 "Nash":["","Jul 2 16:01","https://docs.google.com/spreadsheets/d/1p2VAbj-WRyUJah-l04UjyOtcmVdbqNikR3m9lvZ6ga4/edit?gid=16094208"]
 },
 m: {
-"Malyn":["104","8:00","13.0"],"Adrian":["90","8:00","11.25"],"Elton":["73","6:00","12.17"],
-"Cris":["96","8:00","12"],"Nash":["106","8:00","13.25"],"Elle":["51","4:13","12.09"],
-"Manar":["78","6:00","13"],"Rean":["104","8:00","13"]
+"Malyn":["104","8:00","13.0"],"Elton":["73","6:00","12.17"],"Cris":["96","8:00","12"],
+"Nash":["106","8:00","13.25"],"Elle":["18","N/A","N/A"],"Manar":["78","6:00","13"],
+"Rean":["104","8:00","13"]
 },
 off: []
 },
@@ -79,11 +97,11 @@ r: {
 "Nash":["","Jul 1 17:38","https://docs.google.com/spreadsheets/d/1p2VAbj-WRyUJah-l04UjyOtcmVdbqNikR3m9lvZ6ga4/edit?gid=418388210"]
 },
 m: {
-"Malyn":["104","8:00","13.0"],"Heba":["121","8:30","14.24"],"Elton":["75","6:00","12.5"],
+"Malyn":["104","8:00","13.0"],"Heba":["107","8:00","13.38"],"Elton":["75","6:00","12.5"],
 "Cris":["114","9:30","12"],"Nash":["105","8:00","13.13"],"John Carlo":["83","6:23","13"],
-"Adrian":["106","8:00","—"],"Manar":["107","8:00","13.3"],"Rean":["104","8:00","13"]
+"Elle":["10","N/A","N/A"],"Manar":["107","8:00","13.3"],"Rean":["104","8:00","13"]
 },
-off: []
+off: ["Elle"]
 },
 "June 30, 2026": {
 r: {
